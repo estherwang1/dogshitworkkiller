@@ -1,0 +1,4 @@
+name: 标准规范评估
+description: 扫输入目录的 docx,对每份调 LLM 输出概述(一句话+摘要)和评估(元信息/硬约束/质量分/问题清单)
+entry: runner.py
+version: "1.0"

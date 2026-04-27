@@ -1,0 +1,142 @@
+{
+  "type": "object",
+  "properties": {
+    "标准名称": { "type": "string" },
+    "一句话概括": { "type": "string" },
+    "文档摘要": { "type": "string" },
+
+    "元信息": {
+      "type": "object",
+      "properties": {
+        "标准类型": {
+          "type": "string",
+          "enum": ["原则性", "执行性", "混合性"]
+        },
+        "是否监管要求": {
+          "type": "object",
+          "properties": {
+            "建议": { "type": "string", "enum": ["是", "疑似", "否"] },
+            "置信度": { "type": "string", "enum": ["高", "中", "低"] }
+          },
+          "required": ["建议", "置信度"],
+          "additionalProperties": false
+        },
+        "可检查性主导类型": {
+          "type": "string",
+          "enum": ["自动", "半自动", "人工有标准", "人工主观"]
+        }
+      },
+      "required": ["标准类型", "是否监管要求", "可检查性主导类型"],
+      "additionalProperties": false
+    },
+
+    "硬约束": {
+      "type": "object",
+      "properties": {
+        "内部矛盾": {
+          "type": "object",
+          "properties": {
+            "命中": { "type": "boolean" },
+            "证据": { "type": "string" }
+          },
+          "required": ["命中", "证据"],
+          "additionalProperties": false
+        },
+        "附件图片缺失": {
+          "type": "object",
+          "properties": {
+            "命中": { "type": "boolean" },
+            "证据": { "type": "string" }
+          },
+          "required": ["命中", "证据"],
+          "additionalProperties": false
+        },
+        "引用失效": {
+          "type": "object",
+          "properties": {
+            "命中": { "type": "boolean" },
+            "证据": { "type": "string" }
+          },
+          "required": ["命中", "证据"],
+          "additionalProperties": false
+        },
+        "占位符残留": {
+          "type": "object",
+          "properties": {
+            "命中": { "type": "boolean" },
+            "证据": { "type": "string" }
+          },
+          "required": ["命中", "证据"],
+          "additionalProperties": false
+        },
+        "歧义无法执行": {
+          "type": "object",
+          "properties": {
+            "命中": { "type": "boolean" },
+            "证据": { "type": "string" }
+          },
+          "required": ["命中", "证据"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["内部矛盾", "附件图片缺失", "引用失效", "占位符残留", "歧义无法执行"],
+      "additionalProperties": false
+    },
+
+    "质量分": {
+      "type": "object",
+      "properties": {
+        "表述清晰度": {
+          "type": "object",
+          "properties": {
+            "建议分": { "type": "integer", "minimum": 1, "maximum": 5 },
+            "证据": { "type": "string" }
+          },
+          "required": ["建议分", "证据"],
+          "additionalProperties": false
+        },
+        "结构完整性": {
+          "type": "object",
+          "properties": {
+            "建议分": { "type": "integer", "minimum": 1, "maximum": 5 },
+            "证据": { "type": "string" }
+          },
+          "required": ["建议分", "证据"],
+          "additionalProperties": false
+        },
+        "可操作性": {
+          "type": "object",
+          "properties": {
+            "建议分": {
+              "type": ["integer", "null"],
+              "minimum": 1,
+              "maximum": 5
+            },
+            "证据": { "type": "string" }
+          },
+          "required": ["建议分", "证据"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["表述清晰度", "结构完整性", "可操作性"],
+      "additionalProperties": false
+    },
+
+    "问题清单": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "properties": {
+          "章节": { "type": "string" },
+          "描述": { "type": "string" },
+          "证据": { "type": "string" }
+        },
+        "required": ["章节", "描述", "证据"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["标准名称", "一句话概括", "文档摘要", "元信息", "硬约束", "质量分", "问题清单"],
+  "additionalProperties": false
+}
