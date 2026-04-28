@@ -37,6 +37,12 @@
 > 施工过程中,我们会不断做**设计决策**:这堵墙用砖还是用混凝土?地板用
 > 木头还是瓷砖?这些决策当时有理由,时间一长容易忘,所以记进**改造档案**
 > (**决策日志**),以后想改的时候能翻到当初的考虑。
+>
+> 每完成一个阶段,记一笔**施工日志**(**CHANGELOG**)——做了什么、改了
+> 什么、拆了什么。三个月后回看就知道房子是怎么一步步成型的。
+>
+> 下一步要扩建哪个房间、装修哪面墙,写进**施工计划**(**plan**)——
+> 和图纸目录分开,因为计划经常变,图纸不该跟着变。
 
 ---
 
@@ -48,22 +54,48 @@
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | 图纸目录 | 东西在哪?叫什么? |
 | [CODING_STANDARDS.md](docs/CODING_STANDARDS.md) | 施工标准 | 代码具体怎么写? |
 | [DECISIONS.md](docs/DECISIONS.md) | 改造档案 | 当初为什么这么选? |
+| [CHANGELOG.md](CHANGELOG.md) | 施工日志 | 之前发生过什么? |
+| [plan.md](plan.md) | 施工计划 | 接下来要做什么? |
 
 **阅读顺序建议**:
 
 - **第一次接触项目**:README → 哲学 → 架构 → 编码规范
 - **想上手写代码**:架构 → 编码规范
 - **想理解某个选择**:决策日志
+- **想知道做过什么**:CHANGELOG
+- **想知道要做什么**:plan.md
 - **想从哲学层面讨论**:哲学
 
 ---
 
 ## 快速上手
 
-(待补充,等启动器和第一个任务落地后写 NEW_TASK_GUIDE.md)
+### 新建一个任务
+
+复制 `templates/task_template/` 到 `tasks/` 下,改目录名,按模板里的
+README.md 说明逐个填写文件。
+
+### 跑已有任务
+
+```bash
+cd tasks/01_std_eval
+# 编辑 config.yaml,填入输入输出路径和 LLM 地址
+python runner.py
+```
+
+每个任务目录下有 README.md,说明该任务的用途、配置和运行方式。
+
+### 依赖
+
+项目需要 4 个 Python 包:
+
+- openai
+- python-docx
+- pyyaml
+- openpyxl
 
 ---
 
 ## 项目状态
 
-见 [ARCHITECTURE.md 第七节当前状态快照](docs/ARCHITECTURE.md)。
+见 [CHANGELOG.md](CHANGELOG.md)。

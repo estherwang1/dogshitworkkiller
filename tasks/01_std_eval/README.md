@@ -111,7 +111,3 @@ python tasks/01_std_eval/excel_export.py tasks/01_std_eval
 
 excel_export.py 不调用 LLM,可反复运行。修改 Excel 格式无需重跑 runner。
 items 目录里损坏的 JSON 会被跳过并打印警告,不中断生成。
-
-## 后续
-
-(原"后续"章节内容已并入"Excel 导出"章节)
