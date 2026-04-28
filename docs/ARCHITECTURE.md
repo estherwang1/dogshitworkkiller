@@ -22,34 +22,33 @@
 ```
 DogshitWorkKiller/
 │
-├── launcher/                    # 启动器(Tkinter GUI)
+├── launcher/                    # 启动器(Tkinter GUI)(待实现)
 │   ├── main.py                  # 入口,双击快捷方式跑这个
 │   ├── task_loader.py           # 扫 tasks/ 目录发现任务
 │   ├── config_editor.py         # 配置可视化编辑组件
 │   └── runner_proxy.py          # 起子进程跑任务、捕获日志
 │
 ├── tasks/                       # 所有任务,一个文件夹一个任务
-│   ├── 01_std_eval/             # 任务 1:标准规范评估
-│   ├── 02_std_annotate/         # 任务 2:标准规范分块标注
-│   ├── 03_std_summary/          # 任务 3:标准规范摘要
-│   └── 04_std_import/           # 任务 4:新规范入库
+│   ├── 01_std_eval/             # 任务 1:标准规范评估(含摘要)
+│   └── 02_std_annotate/         # 任务 2:标准规范分块标注
 │
 ├── shared/                      # 多任务共用的零业务工具
 │   (具体模块见第三节)
 │
-├── config/
-│   └── global.yaml              # 全局配置:Python 解释器、API Key
+├── dev_tools/                   # 开发期辅助工具(不进 shared 不进 tasks)
+│   └── inspect_styles.py        # 统计 docx 段落样式分布
 │
-├── templates/
-│   └── task_template/           # 新建任务的模板文件夹
+├── templates/                   # 新建任务的模板(待建)
+│   └── task_template/           # 复制后改名即可用
 │
 ├── docs/
 │   ├── DESIGN_PHILOSOPHY.md     # 设计哲学(世界观)
 │   ├── ARCHITECTURE.md          # 本文档(图纸目录)
 │   ├── CODING_STANDARDS.md      # 编码规范(施工标准)
-│   ├── DECISIONS.md             # 决策日志(改造档案)
-│   └── NEW_TASK_GUIDE.md        # 新建任务手册
+│   └── DECISIONS.md             # 决策日志(改造档案)
 │
+├── CHANGELOG.md                 # 项目演进历史
+├── plan.md                      # 下一步计划
 └── README.md                    # 项目总入口说明
 ```
 
@@ -70,6 +69,7 @@ launcher/  ──进程调用──>  tasks/*/runner.py
 - launcher 不 import tasks,只通过子进程和文件通信
 - tasks 只依赖 shared,任务之间不相互依赖
 - shared 不依赖任何 tasks 或 launcher
+- dev_tools 是独立辅助工具,不被任何组件依赖
 
 依赖规则的具体执行方式见编码规范"项目契约"一章。
 
@@ -79,11 +79,11 @@ launcher/  ──进程调用──>  tasks/*/runner.py
 
 | 模块 | 职责 |
 |------|------|
-| `word_parser.py` | Word 文档结构化解析,产出通用块级列表 |
-| `llm_client.py` | LLM 调用封装,含 JSON 解析兜底、response_format 约束、重试 |
-| `io_utils.py` | 目录扫描、断点续跑判定、失败记录写盘 |
-| `config_loader.py` | 读取 YAML 配置,做基础类型校验 |
-| `excel_writer.py` | 通用 Excel 生成(仅基础能力,业务定制放任务目录) |
+| `word_parser.py` | Word 文档结构化解析,产出通用块级列表。提供 `parse_docx` / `join_for_evaluation` / `format_for_annotation` 三个函数 |
+| `llm_client.py` | LLM 调用封装。`LLMClient` 类复用连接参数,`call_json` 方法含 JSON 解析兜底和 response_format 约束。4 个自定义异常类 |
+| `batch_runner.py` | 批量处理框架。`run_batch` 一个公共函数,承担目录扫描、断点续跑、失败隔离。任务侧只需提供 handler 回调 |
+| `config_loader.py` | 读 YAML 配置文件,返回 dict,做顶层结构校验 |
+| `docx_check.py` | docx 文件质量检查。阈值全部参数化,shared 不预设经验值 |
 
 **模块清单会随项目演化**。新增或修改 shared 模块时更新本表。
 
@@ -103,15 +103,15 @@ launcher/  ──进程调用──>  tasks/*/runner.py
 
 可选文件(按业务需要):
 
-- `prompt.py`:业务 prompt 和 JSON schema
-- `parser.py`:任务专属解析器
-- `postprocess.py`:模型输出后的业务处理
+- `prompt.md`:LLM 提示词模板(数据资产,和代码分离)
+- `schema.json`:JSON schema 约束(配合 prompt 使用)
+- 任务专属模块(如 `chunker.py`、`docx_writer.py`、`excel_export.py`):不通用的业务逻辑,不进 shared
 
 **各文件的具体写法(字段结构、代码模式)见编码规范。**
 
 ---
 
-## 五、启动器职责清单
+## 五、启动器职责清单(待实现)
 
 启动器的五项职责:
 
@@ -125,7 +125,7 @@ launcher/  ──进程调用──>  tasks/*/runner.py
 
 ---
 
-## 六、启动器 UI 布局
+## 六、启动器 UI 布局(待实现)
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -135,7 +135,7 @@ launcher/  ──进程调用──>  tasks/*/runner.py
 │             │                                   │
 │ ○ 任务 1    │ 名称:标准规范评估                 │
 │ ● 任务 2    │ 说明:扫目录跑评估...              │
-│ ○ 任务 3    │                                   │
+│             │                                   │
 │             │ 配置:                             │
 │             │   输入路径: [_________] [浏览]     │
 │             │   模型名:   [下拉选单  ▼]          │
@@ -152,28 +152,7 @@ launcher/  ──进程调用──>  tasks/*/runner.py
 
 ---
 
-## 七、当前状态快照
-
-### 7.1 已有任务
-
-| 编号 | 任务 | 状态 | 说明 |
-|------|------|------|------|
-| 01 | 标准规范评估 | 迁移中 | 来自 standard_docx_evaluate/eval_docx.py |
-| 02 | 标准规范分块标注 | 迁移中 | 来自 standard_docx_evaluate/annotate_docx.py |
-| 03 | 标准规范摘要 | 迁移中 | 来自 standard_docx_evaluate/summary_docx.py |
-| 04 | 新规范入库 | 设计中 | 查重 + 上传平台 + 更新目录 |
-
-### 7.2 下一步计划
-
-1. 搭建启动器基础框架
-2. 迁移任务 01 作为首个样本
-3. 设计任务 04
-4. 扩展到第二个微应用(邮箱整理)
-
----
-
-## 八、本文档的更新规则
+## 七、本文档的更新规则
 
 - 改变目录结构、模块清单、文件清单:必须更新本文档
-- 改变任务状态、下一步计划:更新第七节快照
 - 不涉及结构的代码变动:不必更新本文档(改代码即可)

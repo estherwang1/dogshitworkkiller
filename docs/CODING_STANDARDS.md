@@ -163,27 +163,29 @@ version: "1.0"
 **跨任务命名约定**:
 
 - 路径字段以 `_dir` / `_path` / `_file` 结尾
-- 模型相关字段以 `model_` / `llm_` 开头
+- 模型和 LLM 调用相关字段统一以 `llm_` 开头
 - 阈值字段以 `threshold_` / `max_` / `min_` 开头
 
 示例:
 
 ```yaml
 # 路径类字段
-input_path: C:\std_gov\input
-items_dir: C:\std_gov\eval_items
+input_dir: "C:/std_gov/input"
+output_items_dir: "C:/std_gov/eval_items"
 
-# 模型类字段
-model_name: Qwen3.5-35B-A3B
-model_base_url: http://a.b.c.d:e/v1
+# LLM 调用类字段
+llm_model_name: Qwen3.5-35B-A3B
+llm_base_url: http://a.b.c.d:e/v1
 llm_timeout: 600
+llm_max_tokens: 4096
 
 # 阈值类字段
 threshold_long_doc_chars: 180000
-max_tokens: 4096
 ```
 
-### 3.3 config.schema.yaml 字段结构
+---
+
+## 3.3 config.schema.yaml 字段结构
 
 每个 config.yaml 字段对应一条声明:
 

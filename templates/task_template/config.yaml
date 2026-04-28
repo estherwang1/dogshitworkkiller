@@ -1,0 +1,19 @@
+# 输入输出路径
+input_dir:
+output_items_dir:
+
+# LLM 调用参数
+llm_base_url:
+llm_api_key:
+llm_model_name: Qwen3.5-35B-A3B
+llm_timeout: 600
+llm_max_tokens: 4096
+llm_temperature: 0.1
+
+# 后端专属参数(Qwen vLLM 关闭思考链,其他后端按需改)
+llm_extra_body:
+  chat_template_kwargs:
+    enable_thinking: false
+
+# 业务阈值(按需增删)
+threshold_long_doc_chars: 180000

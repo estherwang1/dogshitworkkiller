@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "示例字段": { "type": "string" }
+  },
+  "required": ["示例字段"],
+  "additionalProperties": false
+}

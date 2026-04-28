@@ -2,6 +2,41 @@
 
 项目演进的历史记录。新条目在上,旧条目在下。
 
+## v0.4 — 阶段四收尾(2026-04-28)
+
+重构的收尾工作:删除旧文件、更新文档、建任务模板,使项目从
+"旧代码 + 新代码混杂"进入"重构后的干净状态"。
+
+### 删除
+
+- `shared/generate_excel.py` — 业务代码,已重写为 `tasks/01_std_eval/excel_export.py`
+- `shared/template_merge.py` — merged.json 中间产物已废弃
+- `shared/check_conversion.py` — 已重写为 `shared/docx_check.py`
+- `tasks/01_std_eval/` 下旧脚本(`eval_docx.py` / `eval_prompt.py`)
+- `tasks/02_std_annotate/` 下旧脚本(`annotate_docx.py` / `annotation_prompt.py`)
+- `tasks/03_std_summary/` 整个目录(已在 v0.2 合并进任务 01)
+- `tasks/ARCHITECTURE.md`(旧"标准规范知识库项目"的架构说明,信息已拆解吸收到各任务 README 和 docs/ARCHITECTURE)
+
+### 新增
+
+- `dev_tools/inspect_styles.py` — 从 shared/ 挪出,开发期辅助工具不混 shared
+- `templates/task_template/` — 新建任务的脚手架(7 个文件),复制后改名即可用。模板 README 承担原 NEW_TASK_GUIDE.md 的职责
+- `CHANGELOG.md` — 项目演进历史(本文件)
+- `plan.md` — 下一步计划,和架构文档分离(计划经常变,架构不该跟着变)
+
+### 修改
+
+- `docs/ARCHITECTURE.md` — 目录树反映真实现状(去掉已删任务、加 dev_tools/templates/CHANGELOG/plan);shared 清单换成实际 5 个模块;任务文件清单的可选文件改为 prompt.md/schema.json;删除第七节整段(任务列表/状态/计划不属于架构)
+- `docs/CODING_STANDARDS.md` 3.2 节 — 跨任务命名约定统一为 `llm_` 前缀(去掉 `model_` 选项),示例和实际代码对齐;路径示例加注释提醒 Windows 双引号陷阱
+- `docs/DECISIONS.md` — 追加决策 06(业务文件命名保持短名)和决策 07(Claude 多文件交付打包 zip)
+- `README.md` — 文档地图加 CHANGELOG 和 plan;造房子比喻加"施工日志"和"施工计划";快速上手段指向 templates;项目状态指向 CHANGELOG
+
+### 关键设计
+
+- 架构文档第七节删除的理由:任务列表是架构(第一节目录树已有),但任务状态和下一步计划是项目管理信息,不属于架构,分别进了 CHANGELOG 和 plan.md
+- templates 而非 NEW_TASK_GUIDE:模板目录自带 README 作为使用说明,比独立的 guide 文档更贴近使用场景,不会产生"两份文档说同一件事"的困惑
+- dev_tools 独立于 shared 和 tasks:开发期辅助工具不被任何组件 import,不是运行时依赖,放 shared 违反 shared 的"零业务通用工具"定位
+
 ---
 
 ## v0.3 — 任务 02 标注迁移(2026-04-27)

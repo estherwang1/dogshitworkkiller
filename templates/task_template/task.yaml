@@ -1,0 +1,5 @@
+# 改这里:任务名和说明
+name: 新任务名称
+description: 一句话说明这个任务做什么
+entry: runner.py
+version: "0.1"

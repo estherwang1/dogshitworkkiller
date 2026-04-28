@@ -56,6 +56,7 @@
 | [DECISIONS.md](docs/DECISIONS.md) | 改造档案 | 当初为什么这么选? |
 | [CHANGELOG.md](CHANGELOG.md) | 施工日志 | 之前发生过什么? |
 | [plan.md](plan.md) | 施工计划 | 接下来要做什么? |
+| [ENVIRONMENT.md](docs/ENVIRONMENT.md) | 施工现场 | 环境怎么搭? |
 
 **阅读顺序建议**:
 
@@ -93,6 +94,11 @@ python runner.py
 - python-docx
 - pyyaml
 - openpyxl
+
+### 环境搭建
+
+如果你的环境是内外网隔离 + 嵌入式 Python,参见 [ENVIRONMENT.md](docs/ENVIRONMENT.md),
+里面有从零搭建的完整步骤。
 
 ---
 
