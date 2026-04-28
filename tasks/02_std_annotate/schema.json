@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "properties": {
+    "标准名称": { "type": "string" },
+    "节标记列表": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "段落编号": { "type": "string" },
+          "节标题预览": { "type": "string" },
+          "识别依据": {
+            "type": "string",
+            "enum": ["编号规整", "格式突出", "语义判断", "混合依据"]
+          },
+          "置信度": {
+            "type": "string",
+            "enum": ["高", "中", "低"]
+          }
+        },
+        "required": ["段落编号", "节标题预览", "识别依据", "置信度"],
+        "additionalProperties": false
+      }
+    },
+    "统计": {
+      "type": "object",
+      "properties": {
+        "总段落数": { "type": "integer" },
+        "标记段落数": { "type": "integer" },
+        "低置信度数": { "type": "integer" }
+      },
+      "required": ["总段落数", "标记段落数", "低置信度数"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["标准名称", "节标记列表", "统计"],
+  "additionalProperties": false
+}

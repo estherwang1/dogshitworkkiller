@@ -1,0 +1,21 @@
+# 输入输出路径
+input_dir: ""
+output_items_dir: ""
+output_docx_dir: ""
+
+# LLM 调用参数
+llm_base_url: "http://a.b.c.d:e/v1"
+llm_api_key: ""
+llm_model_name: "Qwen3.5-35B-A3B"
+llm_timeout: 600
+llm_max_tokens: 8192
+llm_temperature: 0.1
+
+# 后端专属参数(Qwen vLLM 关闭思考链)
+llm_extra_body:
+  chat_template_kwargs:
+    enable_thinking: false
+
+# 分块调用参数
+max_chars_per_call: 80000   # 单次调用最大字符数(约 80K token,留 20K buffer)
+overlap_blocks: 20          # 相邻段重叠的段落数

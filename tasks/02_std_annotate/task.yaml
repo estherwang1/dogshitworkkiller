@@ -1,0 +1,4 @@
+name: 标准规范分块标注
+description: 扫输入目录的 docx,识别节边界并在对应位置插入分块标识符,产出供 HiAgent 知识库分块的新 docx
+entry: runner.py
+version: "1.0"

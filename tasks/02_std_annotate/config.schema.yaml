@@ -1,0 +1,76 @@
+input_dir:
+  type: path
+  widget: dir
+  required: true
+  default: ""
+  description: 输入目录,递归扫描其中的 .docx 文件
+
+output_items_dir:
+  type: path
+  widget: dir
+  required: true
+  default: ""
+  description: 识别结果 JSON 目录,每份输入对应一份 JSON
+
+output_docx_dir:
+  type: path
+  widget: dir
+  required: true
+  default: ""
+  description: 标注后的 docx 输出目录,保持输入的子目录结构
+
+llm_base_url:
+  type: string
+  widget: text
+  required: true
+  default: "http://a.b.c.d:e/v1"
+  description: OpenAI 兼容 API 的基地址
+
+llm_api_key:
+  type: string
+  widget: text
+  required: false
+  default: ""
+  description: API Key,本地部署无认证时可留空
+
+llm_model_name:
+  type: string
+  widget: text
+  required: true
+  default: "Qwen3.5-35B-A3B"
+  description: 使用的模型名
+
+llm_timeout:
+  type: integer
+  widget: number
+  required: true
+  default: 600
+  description: 单次请求超时秒数
+
+llm_max_tokens:
+  type: integer
+  widget: number
+  required: true
+  default: 8192
+  description: 模型输出最大 token 数,长文档识别结果较多,默认 8192
+
+llm_temperature:
+  type: float
+  widget: number
+  required: true
+  default: 0.1
+  description: 采样温度,识别类任务建议 0.1
+
+max_chars_per_call:
+  type: integer
+  widget: number
+  required: true
+  default: 80000
+  description: 单次调用最大字符数,超过此值会分块调用。约对应 80K token
+
+overlap_blocks:
+  type: integer
+  widget: number
+  required: true
+  default: 20
+  description: 分块调用时相邻段的重叠段落数,过小可能漏识别边界,过大浪费 token
