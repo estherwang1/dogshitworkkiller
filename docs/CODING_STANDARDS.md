@@ -146,6 +146,9 @@ def parse_document(path: str) -> list[dict]:
 name: 标准规范评估
 description: 扫输入目录或单份文件,跑 LLM 评估,输出 JSON 和 Excel
 entry: runner.py
+actions:
+  - name: 导出 Excel
+    script: excel_export.py
 version: "1.0"
 ```
 
@@ -153,7 +156,8 @@ version: "1.0"
 
 - `name`: 启动器列表显示的名字
 - `description`: 一句话说明任务做什么
-- `entry`: 入口脚本相对任务目录的路径
+- `entry`: 主入口脚本相对任务目录的路径,启动器的"运行"按钮执行这个脚本
+- `actions`: 附加操作列表(可选),每项含 `name`(按钮显示名)和 `script`(脚本相对路径)。启动器为每个 action 生成一个额外按钮。无附加操作时省略此字段
 - `version`: 任务版本
 
 ### 3.2 config.yaml 字段结构

@@ -1,0 +1,3 @@
+# 启动器自身配置
+# project_root 留空时,自动取 launcher/ 目录的父目录
+project_root: ""

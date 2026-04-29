@@ -2,6 +2,35 @@
 
 项目演进的历史记录。新条目在上,旧条目在下。
 
+## v0.5 — 启动器实现(2026-04-29)
+
+实现 Tkinter GUI 启动器,用户可以在图形界面中选任务、编辑配置、
+运行脚本、查看实时日志,不再需要手动敲命令行。
+
+### 新增
+
+- `launcher/main.py` — 启动器入口,构建主窗口,组装任务列表/详情/配置/日志
+- `launcher/task_loader.py` — 扫 tasks/ 目录读 task.yaml,返回任务元信息列表
+- `launcher/config_editor.py` — 读 config.schema.yaml + config.yaml,动态生成 Tkinter 编辑控件,保存回 config.yaml
+- `launcher/runner_proxy.py` — 用 Popen 起子进程跑脚本,线程读 stdout 推日志到回调
+- `launcher/launcher_config.yaml` — 启动器自身配置(项目根目录,默认自动取 launcher 父目录)
+
+### 修改
+
+- `tasks/01_std_eval/task.yaml` — 新增 `actions` 字段,把 excel_export.py 注册为附加操作"导出 Excel",可从启动器按钮触发
+- `docs/ARCHITECTURE.md` — launcher 目录从"待实现"更新为实际文件清单;第四节 task.yaml 字段说明加 `actions`;第五/六节去掉"待实现"标记,补充 actions 按钮和启动器自身配置的说明
+- `docs/CODING_STANDARDS.md` — 3.1 节 task.yaml 字段结构加 `actions` 字段说明和示例
+- `plan.md` — "搭建启动器基础框架"从远期移除
+
+### 关键设计
+
+- task.yaml 的 `entry` 保持单入口字符串,附加操作用 `actions` 列表扩展。大部分任务只有一个入口,不需要为多入口改基础结构
+- 启动器自身配置(launcher_config.yaml)和任务配置分离。启动器是独立组件,不把自己的配置混进任务的 config.yaml
+- 配置编辑器保存时保留 schema 未覆盖的字段(如 llm_extra_body),不会因为 schema 里没声明就丢掉原有配置
+- 子进程日志用独立线程读 stdout,通过 Tkinter 的 after 机制调度到主线程更新 UI,避免阻塞
+
+---
+
 ## v0.4 — 阶段四收尾(2026-04-28)
 
 重构的收尾工作:删除旧文件、更新文档、建任务模板,使项目从

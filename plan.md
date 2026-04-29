@@ -12,7 +12,6 @@
 
 ## 远期
 
-- 搭建启动器基础框架(Tkinter GUI,读 task.yaml / config.schema.yaml 生成界面)
 - 设计并实现任务 04:新规范入库(查重 + 上传平台 + 更新目录)
 - 在内网完整跑通 60 份文档的评估 + 标注
 - HiAgent 端配置按 `<<<SECTION>>>` 分块,用业务问题测 RAG 召回效果
