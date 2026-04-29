@@ -1,5 +1,4 @@
 """子进程代理
-
 用 subprocess.Popen 启动任务脚本,实时读 stdout 并通过回调推送给调用方。
 
 设计要点:
@@ -7,6 +6,8 @@
 - 回调函数在子线程里执行,调用方负责线程安全(Tkinter 的 after 机制)
 - 支持查询运行状态和等待结束
 """
+
+import os
 import subprocess
 import sys
 import threading
@@ -55,6 +56,10 @@ class RunnerProxy:
             raise RuntimeError("已有任务在运行")
 
         self._running = True
+
+        # 构建子进程环境,确保 PYTHONUTF8=1 传递下去
+        env = os.environ.copy()
+
         self._process = subprocess.Popen(
             [sys.executable, str(script_path), str(task_dir)],
             stdout=subprocess.PIPE,
@@ -63,6 +68,7 @@ class RunnerProxy:
             text=True,
             encoding="utf-8",
             errors="replace",
+            env=env,
         )
 
         def _reader():

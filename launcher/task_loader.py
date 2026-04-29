@@ -1,5 +1,4 @@
 """任务发现
-
 扫 tasks/ 目录,读各任务的 task.yaml,返回任务元信息列表。
 
 每个任务的元信息包含:
@@ -10,9 +9,10 @@
 - version: 版本号
 - task_dir: 任务目录的绝对路径(由本模块补充,不来自 task.yaml)
 """
-from pathlib import Path
 
+from pathlib import Path
 import yaml
+from encoding_utils import safe_open
 
 
 def discover_tasks(project_root: Path) -> list[dict]:
@@ -40,22 +40,24 @@ def discover_tasks(project_root: Path) -> list[dict]:
         if not task_yaml.is_file():
             continue
         try:
-            with task_yaml.open("r", encoding="utf-8") as f:
+            with safe_open(task_yaml, "r") as f:
                 meta = yaml.safe_load(f)
             if not isinstance(meta, dict):
-                print(f"  ⚠ {task_yaml}: 顶层不是 dict,跳过")
+                print(f" ⚠ {task_yaml}: 顶层不是 dict,跳过")
                 continue
         except Exception as e:
-            print(f"  ⚠ {task_yaml}: 读取失败 ({e}),跳过")
+            print(f" ⚠ {task_yaml}: 读取失败 ({e}),跳过")
             continue
 
         meta["task_dir"] = child.resolve()
+
         # 确保基本字段存在
         meta.setdefault("name", child.name)
         meta.setdefault("description", "")
         meta.setdefault("entry", "runner.py")
         meta.setdefault("actions", [])
         meta.setdefault("version", "")
+
         tasks.append(meta)
 
     return tasks

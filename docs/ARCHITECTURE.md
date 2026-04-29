@@ -27,6 +27,7 @@ DogshitWorkKiller/
 │   ├── task_loader.py           # 扫 tasks/ 目录发现任务
 │   ├── config_editor.py         # 配置可视化编辑组件
 │   ├── runner_proxy.py          # 起子进程跑任务、捕获日志
+│   ├── encoding_utils.py        # 处理GDK和utf-8不兼容的问题
 │   └── launcher_config.yaml     # 启动器自身配置(项目根目录等)
 │
 ├── tasks/                       # 所有任务,一个文件夹一个任务

@@ -1,5 +1,4 @@
 """配置编辑器
-
 读 config.schema.yaml 和 config.yaml,在指定的 Tkinter 父容器里动态生成
 编辑控件。用户改完后可调 save() 写回 config.yaml。
 
@@ -15,12 +14,13 @@
 - 字段按 schema 文件中的顺序排列
 - description 显示为控件下方的灰色提示文字
 """
+
 import tkinter as tk
 from tkinter import filedialog, ttk
 from pathlib import Path
 from typing import Optional
-
 import yaml
+from encoding_utils import safe_open
 
 
 class ConfigEditor:
@@ -38,7 +38,6 @@ class ConfigEditor:
         self._config: dict = {}
         self._widgets: dict[str, tk.Variable] = {}  # 字段名 → Variable
         self._field_order: list[str] = []
-
         self._load_schema()
         self._load_config()
         self._build_ui()
@@ -48,12 +47,15 @@ class ConfigEditor:
         if not schema_path.is_file():
             self._schema = {}
             return
-        with schema_path.open("r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-        if isinstance(data, dict):
-            self._schema = data
-            self._field_order = list(data.keys())
-        else:
+        try:
+            with safe_open(schema_path, "r") as f:
+                data = yaml.safe_load(f)
+            if isinstance(data, dict):
+                self._schema = data
+                self._field_order = list(data.keys())
+            else:
+                self._schema = {}
+        except Exception:
             self._schema = {}
 
     def _load_config(self):
@@ -61,11 +63,14 @@ class ConfigEditor:
         if not config_path.is_file():
             self._config = {}
             return
-        with config_path.open("r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-        if isinstance(data, dict):
-            self._config = data
-        else:
+        try:
+            with safe_open(config_path, "r") as f:
+                data = yaml.safe_load(f)
+            if isinstance(data, dict):
+                self._config = data
+            else:
+                self._config = {}
+        except Exception:
             self._config = {}
 
     def _build_ui(self):
@@ -91,6 +96,7 @@ class ConfigEditor:
             "<Configure>",
             lambda e: canvas.configure(scrollregion=canvas.bbox("all")),
         )
+
         canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
 
@@ -153,10 +159,8 @@ class ConfigEditor:
             var = tk.StringVar(value=str(current_value) if current_value else "")
             entry_frame = tk.Frame(field_frame)
             entry_frame.pack(fill="x")
-
             entry = tk.Entry(entry_frame, textvariable=var)
             entry.pack(side="left", fill="x", expand=True)
-
             if widget_type in ("dir", "file_or_dir"):
                 btn_dir = tk.Button(
                     entry_frame,
@@ -165,7 +169,6 @@ class ConfigEditor:
                     command=lambda v=var: self._browse_dir(v),
                 )
                 btn_dir.pack(side="left", padx=(4, 0))
-
             if widget_type in ("file", "file_or_dir"):
                 btn_file = tk.Button(
                     entry_frame,
@@ -174,11 +177,9 @@ class ConfigEditor:
                     command=lambda v=var: self._browse_file(v),
                 )
                 btn_file.pack(side="left", padx=(4, 0))
-
             self._widgets[name] = var
 
-        else:
-            # text / number / 其他一律用 Entry
+        else:  # text / number / 其他一律用 Entry
             var = tk.StringVar(value=str(current_value) if current_value is not None else "")
             entry = tk.Entry(field_frame, textvariable=var)
             entry.pack(fill="x")
@@ -219,6 +220,7 @@ class ConfigEditor:
         """
         # 从控件收集值
         updated = dict(self._config)  # 保留 schema 未覆盖的字段
+
         for name in self._field_order:
             schema = self._schema.get(name, {})
             if not isinstance(schema, dict):
@@ -252,7 +254,7 @@ class ConfigEditor:
 
         config_path = self._task_dir / "config.yaml"
         try:
-            with config_path.open("w", encoding="utf-8") as f:
+            with safe_open(config_path, "w") as f:
                 yaml.dump(
                     updated,
                     f,

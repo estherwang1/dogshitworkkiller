@@ -1,25 +1,24 @@
 """DogshitWorkKiller 启动器
-
-双击或命令行运行即可:
-    python launcher/main.py
+双击或命令行运行即可: python launcher/main.py
 
 主窗口布局:
 ┌──────────────────────────────────────────────────┐
 │ 项目根目录: [____________________________] [浏览] │
 ├──────────────┬───────────────────────────────────┤
-│ 任务列表      │ 任务详情 / 配置编辑                │
+│ 任务列表     │ 任务详情 / 配置编辑               │
 │              │                                   │
-│ ○ 任务 1     │ 名称:...                         │
-│ ● 任务 2     │ 说明:...                         │
+│ ○ 任务 1     │ 名称:...                          │
+│ ● 任务 2     │ 说明:...                          │
 │              │ 配置:                             │
-│              │   (动态生成的编辑控件)             │
+│              │ (动态生成的编辑控件)               │
 │              │                                   │
-│              │ [保存配置] [运行] [动作...] [打开]  │
+│              │ [保存配置] [运行] [动作...] [打开] │
 │              ├───────────────────────────────────┤
 │              │ 日志:                             │
-│              │  ...                              │
+│              │ ...                               │
 └──────────────┴───────────────────────────────────┘
 """
+
 import os
 import platform
 import subprocess
@@ -27,13 +26,12 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from pathlib import Path
 from typing import Optional
-
 import yaml
 
+from encoding_utils import safe_open
 from task_loader import discover_tasks
 from config_editor import ConfigEditor
 from runner_proxy import RunnerProxy
-
 
 # ────────────────────── 启动器自身配置 ──────────────────────
 
@@ -44,10 +42,10 @@ LAUNCHER_CONFIG_PATH = LAUNCHER_DIR / "launcher_config.yaml"
 def _load_launcher_config() -> dict:
     if LAUNCHER_CONFIG_PATH.is_file():
         try:
-            with LAUNCHER_CONFIG_PATH.open("r", encoding="utf-8") as f:
+            with safe_open(LAUNCHER_CONFIG_PATH, "r") as f:
                 data = yaml.safe_load(f)
-            if isinstance(data, dict):
-                return data
+                if isinstance(data, dict):
+                    return data
         except Exception:
             pass
     return {}
@@ -55,7 +53,7 @@ def _load_launcher_config() -> dict:
 
 def _save_launcher_config(config: dict):
     try:
-        with LAUNCHER_CONFIG_PATH.open("w", encoding="utf-8") as f:
+        with safe_open(LAUNCHER_CONFIG_PATH, "w") as f:
             yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
     except Exception as e:
         print(f"保存启动器配置失败: {e}")
@@ -73,6 +71,7 @@ def _resolve_project_root(config: dict) -> Path:
 
 # ────────────────────── 主应用 ──────────────────────
 
+
 class App:
     # 排版常量
     PAD_X = 12
@@ -89,7 +88,6 @@ class App:
         self._selected_index: int = -1
         self._config_editor: Optional[ConfigEditor] = None
         self._runner = RunnerProxy()
-
         self._build_window()
         self._refresh_tasks()
 
@@ -118,14 +116,11 @@ class App:
         bar.pack(fill="x", padx=self.PAD_X)
 
         tk.Label(bar, text="项目根目录:").pack(side="left")
-
         self._root_var = tk.StringVar(value=str(self._project_root))
         entry = tk.Entry(bar, textvariable=self._root_var, width=60)
         entry.pack(side="left", padx=(4, 0), fill="x", expand=True)
-
         btn = tk.Button(bar, text="浏览", width=6, command=self._browse_root)
         btn.pack(side="left", padx=(4, 0))
-
         btn_apply = tk.Button(bar, text="应用", width=6, command=self._apply_root)
         btn_apply.pack(side="left", padx=(4, 0))
 
@@ -140,7 +135,6 @@ class App:
         # ── 左侧:任务列表 ──
         left = tk.Frame(main, width=200)
         main.add(left, minsize=160)
-
         tk.Label(left, text="任务列表", font=("", 10, "bold")).pack(
             anchor="w", padx=4, pady=(4, 2)
         )
@@ -173,7 +167,6 @@ class App:
         tk.Label(log_frame, text="运行日志", font=("", 10, "bold")).pack(
             anchor="w", padx=4, pady=(4, 2)
         )
-
         log_inner = tk.Frame(log_frame)
         log_inner.pack(fill="both", expand=True, padx=4, pady=(0, 4))
 
@@ -277,7 +270,6 @@ class App:
         tk.Label(config_frame, text="配置", font=("", 10, "bold")).pack(
             anchor="w", padx=8, pady=(2, 0)
         )
-
         editor_container = tk.Frame(config_frame)
         editor_container.pack(fill="both", expand=True)
 
@@ -288,13 +280,17 @@ class App:
         btn_frame.pack(fill="x", padx=8, pady=(4, 8))
 
         self._btn_save = tk.Button(
-            btn_frame, text="保存配置", width=10,
+            btn_frame,
+            text="保存配置",
+            width=10,
             command=self._on_save,
         )
         self._btn_save.pack(side="left", padx=(0, 6))
 
         self._btn_run = tk.Button(
-            btn_frame, text="▶ 运行", width=10,
+            btn_frame,
+            text="▶ 运行",
+            width=10,
             command=lambda: self._on_run(task),
         )
         self._btn_run.pack(side="left", padx=(0, 6))
@@ -312,7 +308,9 @@ class App:
             self._action_buttons.append(btn)
 
         self._btn_open = tk.Button(
-            btn_frame, text="打开输出目录", width=12,
+            btn_frame,
+            text="打开输出目录",
+            width=12,
             command=self._on_open_output,
         )
         self._btn_open.pack(side="right")
@@ -340,6 +338,7 @@ class App:
         if self._runner.is_running:
             messagebox.showwarning("提示", "已有任务在运行,请等待完成")
             return
+
         if not script.is_file():
             messagebox.showerror("错误", f"脚本不存在: {script}")
             return
@@ -369,6 +368,7 @@ class App:
 
     def _on_run_finish(self, returncode: int):
         """子线程回调,用 after 调度到主线程。"""
+
         def _finish():
             self._log_append(f"{'─' * 50}\n")
             if returncode == 0:
@@ -376,6 +376,7 @@ class App:
             else:
                 self._log_append(f">>> 运行结束,退出码: {returncode}\n")
             self._set_buttons_state("normal")
+
         self._root.after(0, _finish)
 
     def _log_append(self, text: str):
@@ -431,7 +432,6 @@ class App:
         if not tasks_dir.is_dir():
             messagebox.showwarning("提示", f"该目录下没有 tasks/ 子目录:\n{p}")
             return
-
         self._project_root = p.resolve()
         self._launcher_config["project_root"] = str(self._project_root)
         _save_launcher_config(self._launcher_config)
@@ -444,6 +444,7 @@ class App:
 
 
 # ────────────────────── 工具函数 ──────────────────────
+
 
 def _open_folder(path: Path):
     """跨平台打开文件夹。"""
