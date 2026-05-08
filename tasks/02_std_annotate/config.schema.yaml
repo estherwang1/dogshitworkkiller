@@ -1,3 +1,11 @@
+llm_backend:
+  type: enum
+  widget: dropdown
+  options: ["openai", "hiagent"]
+  required: true
+  default: openai
+  description: 后端类型。openai 直连大模型 API,hiagent 走智能体代理
+
 input_dir:
   type: path
   widget: dir
@@ -22,9 +30,9 @@ output_docx_dir:
 llm_base_url:
   type: string
   widget: text
-  required: true
+  required: false
   default: "http://a.b.c.d:e/v1"
-  description: OpenAI 兼容 API 的基地址
+  description: OpenAI 兼容 API 的基地址(llm_backend 为 openai 时必填)
 
 llm_api_key:
   type: string
@@ -36,30 +44,30 @@ llm_api_key:
 llm_model_name:
   type: string
   widget: text
-  required: true
+  required: false
   default: "Qwen3.5-35B-A3B"
-  description: 使用的模型名
+  description: 使用的模型名(llm_backend 为 openai 时必填)
 
 llm_timeout:
   type: integer
   widget: number
   required: true
   default: 600
-  description: 单次请求超时秒数
+  description: 单次请求超时秒数(两种后端通用)
 
 llm_max_tokens:
   type: integer
   widget: number
   required: true
   default: 8192
-  description: 模型输出最大 token 数,长文档识别结果较多,默认 8192
+  description: 模型输出最大 token 数(openai 后端生效,hiagent 侧在智能体配置里设)
 
 llm_temperature:
   type: float
   widget: number
   required: true
   default: 0.1
-  description: 采样温度,识别类任务建议 0.1
+  description: 采样温度(openai 后端生效,hiagent 侧在智能体配置里设)
 
 max_chars_per_call:
   type: integer
@@ -74,3 +82,24 @@ overlap_blocks:
   required: true
   default: 20
   description: 分块调用时相邻段的重叠段落数,过小可能漏识别边界,过大浪费 token
+
+hiagent_base_url:
+  type: string
+  widget: text
+  required: false
+  default: ""
+  description: HiAgent API 基地址,如 http://x.x.x.x:port/api/proxy/api/v1(llm_backend 为 hiagent 时必填)
+
+hiagent_api_key:
+  type: string
+  widget: text
+  required: false
+  default: ""
+  description: HiAgent 的 ApiKey(llm_backend 为 hiagent 时必填)
+
+hiagent_user_id:
+  type: string
+  widget: text
+  required: false
+  default: batch-runner
+  description: HiAgent 用户标识,1-20 字符,用于检索和统计

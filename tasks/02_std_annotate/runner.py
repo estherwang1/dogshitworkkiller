@@ -30,7 +30,7 @@ if str(TASK_DIR) not in sys.path:
 
 from shared.batch_runner import run_batch
 from shared.config_loader import load_config
-from shared.llm_client import LLMClient
+from shared.client_factory import create_llm_client
 from shared.word_parser import format_for_annotation, parse_docx
 
 from chunker import merge_chunk_results, split_into_chunks
@@ -62,12 +62,7 @@ def main():
     prompt_template = _load_prompt_template(task_dir)
     schema = _load_schema(task_dir)
 
-    llm = LLMClient(
-        base_url=config["llm_base_url"],
-        api_key=config.get("llm_api_key", ""),
-        model=config["llm_model_name"],
-        timeout=config.get("llm_timeout", 600),
-    )
+    llm = create_llm_client(config)
 
     max_tokens = config.get("llm_max_tokens", 8192)
     temperature = config.get("llm_temperature", 0.1)

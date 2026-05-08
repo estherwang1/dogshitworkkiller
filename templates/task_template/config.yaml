@@ -1,8 +1,11 @@
+# 后端选择: openai(直连大模型 API) 或 hiagent(走智能体代理)
+llm_backend: openai
+
 # 输入输出路径
 input_dir:
 output_items_dir:
 
-# LLM 调用参数
+# LLM 调用参数(llm_backend 为 openai 时使用)
 llm_base_url:
 llm_api_key:
 llm_model_name: Qwen3.5-35B-A3B
@@ -14,6 +17,11 @@ llm_temperature: 0.1
 llm_extra_body:
   chat_template_kwargs:
     enable_thinking: false
+
+# HiAgent 智能体参数(llm_backend 为 hiagent 时使用)
+hiagent_base_url:
+hiagent_api_key:
+hiagent_user_id: batch-runner
 
 # 业务阈值(按需增删)
 threshold_long_doc_chars: 180000

@@ -22,7 +22,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from shared.config_loader import load_config
-from shared.llm_client import LLMClient
+from shared.client_factory import create_llm_client
 from shared.batch_runner import run_batch
 from shared.word_parser import parse_docx, join_for_evaluation
 
@@ -55,12 +55,7 @@ def main():
     prompt_template = _load_prompt_template(task_dir)
     schema = _load_schema(task_dir)
 
-    llm = LLMClient(
-        base_url=config["llm_base_url"],
-        api_key=config.get("llm_api_key", ""),
-        model=config["llm_model_name"],
-        timeout=config.get("llm_timeout", 600),
-    )
+    llm = create_llm_client(config)
 
     threshold_long = config.get("threshold_long_doc_chars", 180000)
     max_tokens = config.get("llm_max_tokens", 4096)

@@ -83,6 +83,8 @@ launcher/  ──进程调用──>  tasks/*/runner.py
 |------|------|
 | `word_parser.py` | Word 文档结构化解析,产出通用块级列表。提供 `parse_docx` / `join_for_evaluation` / `format_for_annotation` 三个函数 |
 | `llm_client.py` | LLM 调用封装。`LLMClient` 类复用连接参数,`call_json` 方法含 JSON 解析兜底和 response_format 约束。4 个自定义异常类 |
+| `hiagent_client.py` | HiAgent 智能体 API 封装。`HiAgentClient` 类,`call_json` 接口与 `LLMClient` 一致。每次调用新建会话,blocking 模式等完整回复 |
+| `client_factory.py` | 客户端工厂。`create_llm_client` 根据 config 的 `llm_backend` 字段创建 `LLMClient` 或 `HiAgentClient` 实例 |
 | `batch_runner.py` | 批量处理框架。`run_batch` 一个公共函数,承担目录扫描、断点续跑、失败隔离。任务侧只需提供 handler 回调 |
 | `config_loader.py` | 读 YAML 配置文件,返回 dict,做顶层结构校验 |
 | `docx_check.py` | docx 文件质量检查。阈值全部参数化,shared 不预设经验值 |

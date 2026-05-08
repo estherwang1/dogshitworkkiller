@@ -88,12 +88,13 @@ python runner.py
 
 ### 依赖
 
-项目需要 4 个 Python 包:
+项目需要 5 个 Python 包:
 
 - openai
 - python-docx
 - pyyaml
 - openpyxl
+- requests
 
 ### 环境搭建
 

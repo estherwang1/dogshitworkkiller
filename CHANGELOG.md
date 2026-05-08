@@ -2,6 +2,36 @@
 
 项目演进的历史记录。新条目在上,旧条目在下。
 
+## v0.6 — HiAgent 智能体后端接入(2026-05-02)
+
+新增 HiAgent 智能体作为 LLM 调用的备选后端,用于内网办公环境
+无法直连大模型 API 但有智能体平台可用的场景。
+
+### 新增
+
+- `shared/hiagent_client.py` — HiAgent 智能体 API 封装,对外暴露和 LLMClient 相同的 call_json 接口。每次调用新建会话避免上下文污染,blocking 模式等完整回复,用 extract_first_json 解析 JSON
+- `shared/client_factory.py` — 工厂函数 create_llm_client,根据 config 里的 llm_backend 字段选择实例化 LLMClient 或 HiAgentClient
+
+### 修改
+
+- `tasks/01_std_eval/runner.py` — 用 create_llm_client(config) 替代直接实例化 LLMClient
+- `tasks/02_std_annotate/runner.py` — 同上
+- `tasks/01_std_eval/config.yaml` + `config.schema.yaml` — 新增 llm_backend / hiagent_base_url / hiagent_api_key / hiagent_user_id 字段
+- `tasks/02_std_annotate/config.yaml` + `config.schema.yaml` — 同上
+- `templates/task_template/runner.py` — 改用 create_llm_client
+- `templates/task_template/config.yaml` + `config.schema.yaml` — 新增 hiagent 相关字段
+- `docs/ARCHITECTURE.md` — shared 模块清单加 hiagent_client 和 client_factory
+
+### 关键设计
+
+- HiAgentClient.call_json 的签名和 LLMClient.call_json 完全一致(包括 temperature / max_tokens / extra_body 参数),但这些参数在 HiAgent 侧不生效——它们在智能体配置里设定。保留参数是为了调用方代码兼容,不需要判断是哪个 client
+- 每次 call_json 新建会话而不是复用,理由:批量处理中每次调用是独立的文档,复用会话会让智能体带上前一份文档的上下文,污染结果
+- 工厂函数放 shared 而不是各任务自己写,理由:两个任务(加模板)的创建逻辑完全相同,符合 DRY;工厂函数本身不含业务词汇,搬到别的项目能直接用
+- HiAgent 没有 response_format 约束,JSON 输出稳定性依赖两层保障:智能体 system prompt 里的"输出纯 JSON"指令 + extract_first_json 兜底解析
+- 新增 requests 为项目依赖(hiagent_client 需要)
+
+---
+
 ## v0.5 — 启动器实现(2026-04-29)
 
 实现 Tkinter GUI 启动器,用户可以在图形界面中选任务、编辑配置、

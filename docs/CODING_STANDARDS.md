@@ -115,7 +115,7 @@ def parse_document(path: str) -> list[dict]:
 1. 路径、模型名、阈值、API Key 不允许出现在代码里
 2. 配置按"读者和变化频率"拆分到不同文件,不能一个大 config 装所有
 3. 配置字段必须有类型和用途声明(让启动器能生成可视化编辑 UI)
-4. 配置字段必须遵守跨任务统一的命名约定(见 3.3 节)
+4. 配置字段必须遵守跨任务统一的命名约定(见 3.2 节)
 
 ### 2.4 启动器与任务的通信
 
@@ -168,20 +168,29 @@ version: "1.0"
 
 - 路径字段以 `_dir` / `_path` / `_file` 结尾
 - 模型和 LLM 调用相关字段统一以 `llm_` 开头
+- HiAgent 智能体相关字段统一以 `hiagent_` 开头
 - 阈值字段以 `threshold_` / `max_` / `min_` 开头
 
 示例:
 
 ```yaml
+# 后端选择
+llm_backend: openai            # 枚举: openai / hiagent
+
 # 路径类字段
 input_dir: "C:/std_gov/input"
 output_items_dir: "C:/std_gov/eval_items"
 
-# LLM 调用类字段
+# LLM 调用类字段(llm_backend 为 openai 时使用)
 llm_model_name: Qwen3.5-35B-A3B
 llm_base_url: http://a.b.c.d:e/v1
 llm_timeout: 600
 llm_max_tokens: 4096
+
+# HiAgent 智能体字段(llm_backend 为 hiagent 时使用)
+hiagent_base_url: http://x.x.x.x:port/api/proxy/api/v1
+hiagent_api_key: your-api-key
+hiagent_user_id: batch-runner
 
 # 阈值类字段
 threshold_long_doc_chars: 180000
@@ -249,6 +258,7 @@ python runner.py
 import sys
 from pathlib import Path
 from shared.config_loader import load_config
+from shared.client_factory import create_llm_client
 
 # 设置 stdout 行缓冲,让启动器实时捕获日志
 sys.stdout.reconfigure(line_buffering=True)
@@ -260,6 +270,9 @@ else:
     task_dir = Path(__file__).parent
 
 config = load_config(task_dir / "config.yaml")
+
+# 根据 config 里的 llm_backend 字段自动选择 LLMClient 或 HiAgentClient
+llm = create_llm_client(config)
 
 # 之后就是任务业务逻辑
 ...
