@@ -69,6 +69,14 @@ def _resolve_project_root(config: dict) -> Path:
     return LAUNCHER_DIR.parent.resolve()
 
 
+# ────────────────────── 分隔线样式 ──────────────────────
+
+# 上下分隔线的宽度和颜色
+SASH_WIDTH = 6
+SASH_COLOR = "#C0C0C0"
+SASH_RELIEF = "flat"
+
+
 # ────────────────────── 主应用 ──────────────────────
 
 
@@ -153,7 +161,15 @@ class App:
         main.add(right, minsize=500)
 
         # 右侧再上下分:上面是详情+配置+按钮,下面是日志
-        right_paned = tk.PanedWindow(right, orient="vertical", sashwidth=4)
+        # 用更宽的 sash + 灰色背景,让分隔线可见且易拖拽
+        right_paned = tk.PanedWindow(
+            right,
+            orient="vertical",
+            sashwidth=SASH_WIDTH,
+            bg=SASH_COLOR,
+            sashrelief=SASH_RELIEF,
+            sashpad=1,
+        )
         right_paned.pack(fill="both", expand=True)
 
         # 上半:任务详情 + 配置
